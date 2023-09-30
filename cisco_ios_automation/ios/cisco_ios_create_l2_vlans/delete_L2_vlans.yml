@@ -1,0 +1,58 @@
+---
+- name: Create VLANs on Cisco Switch
+  hosts: cisco_ios_sw
+  gather_facts: no
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python
+  tasks:
+    - name: Before Change VLAN
+      ios_command:
+        commands:
+          - show vlan brief
+      register: result
+    
+    - name: VLAN Configuration before change
+      debug:
+        var: result.stdout_lines
+
+    - name: Read VLAN information from the text file
+      slurp:
+        src: delete_L2_vlans_list.txt
+      register: vlan_file
+
+    - name: Parse VLAN information
+      set_fact:
+        vlan_list: "{{ vlan_file.content | b64decode | split('\n') }}"
+      when: vlan_file is succeeded
+
+    - name: Create VLANs on the Switch
+      ios_config:
+        lines:
+          - "no vlan {{ vlan }}"
+      loop: "{{ vlan_list }}"
+      loop_control:
+        loop_var: vlan
+      when: vlan_file is succeeded
+
+    - name: After Change VLAN
+      ios_command:
+        commands:
+          - show vlan brief
+      register: result
+    
+    - name: VLAN Configuration after change
+      debug:
+        var: result.stdout_lines
+
+    - name: Saving Configuration
+      ios_command:
+        commands:
+          - write memory
+      register: result
+    
+    - name: Output configuration Saving
+      debug:
+        var: result.stdout_lines
+
+

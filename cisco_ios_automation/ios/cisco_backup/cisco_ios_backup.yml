@@ -1,0 +1,57 @@
+- name: Temp directory created to store backup locally for later copy to remoter backup server
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Creating local backup directory
+      become: true
+      become_user: nigam
+      ansible.builtin.file:
+        path: /home/nigam/ansible_automation/cisco/ios/cisco_backup/tmp
+        state: directory
+
+- name: Playing task for taking backup`
+  hosts: cisco_ios_sw
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Execute command to show run to captuer backup from devices
+      ios_command:
+        commands:
+          - show running-config
+      register: config_output
+      no_log: true
+
+    - name: Generate the backup file name
+      set_fact:
+        #backup_file: "{{ inventory_hostname }}_{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}.txt"
+        backup_file: "{{ inventory_hostname }}_{{ lookup('pipe', 'date +%Y%m%d') }}.txt"
+
+    - name: Save the configuration to a file
+      copy:
+        content: "{{ config_output.stdout[0] }}"
+        dest: /home/nigam/ansible_automation/cisco/ios/cisco_backup/tmp/{{ backup_file }}
+        backup: yes
+      delegate_to: localhost
+      become: no
+    
+- name: Copy Cisco ISO backup files to Remote Backup Server
+  hosts: backup_server
+  gather_facts: no
+  tasks:
+    - name: Copying the Directory's contents (sub directories/files)
+      become: true
+      become_user: nigam # Provide remote server username here
+      copy:
+        src: /home/nigam/ansible_automation/cisco/ios/cisco_backup/tmp/
+        dest: /home/nigam/backup_ios
+
+- name: Deleting file from Ansible host
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Collecting all files from local backup folder
+      become: true
+      become_user: nigam
+      ansible.builtin.file:
+        path: /home/nigam/ansible_automation/cisco/ios/cisco_backup/tmp
+        state: absent

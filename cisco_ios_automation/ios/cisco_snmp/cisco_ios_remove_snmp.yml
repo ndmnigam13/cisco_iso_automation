@@ -1,0 +1,26 @@
+---
+- name: Play Removing SNMP Config All Switches
+  hosts: cisco_ios_sw
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: Deleting SNMP from devices
+      cisco.ios.ios_config:
+        lines:
+          - no snmp-server
+
+    - name: Verify SNMP status after change
+      cisco.ios.ios_command:
+        commands:
+          - show run | s snmp
+      register: SNMP_Result
+
+    - name: Saving Configuration
+      cisco.ios.ios_command:
+        commands:
+          - write memory
+      register: write_output
+    
+    - name: Diplay SNMP status
+      ansible.builtin.debug:
+        var: write_output.stdout_lines[0]

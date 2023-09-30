@@ -1,0 +1,17 @@
+---
+
+- name: Split VLAN entry into VLAN ID and VLAN name
+  set_fact:
+    vlan_id: "{{ vlan_entry.split(',')[0] }}"
+    vlan_name: "{{ vlan_entry.split(',')[1] }}"
+    configure_vlan: False
+    
+
+- name: Configure SNMP
+  ios_config:
+    lines:
+      - "snmp-server community {{ vlan_id }} ro"
+      - "snmp-server location {{ vlan_name }}"
+    #when: vlan_status is search("not found in")
+
+...

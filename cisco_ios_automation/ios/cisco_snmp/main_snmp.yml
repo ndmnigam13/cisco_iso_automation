@@ -1,0 +1,26 @@
+---
+- name: Ensure VLANs exist on Cisco switch
+  hosts: cisco_ios_sw
+  serial: 1 # Use when you want to run commands on one by one device
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Read VLAN entries from file
+      slurp:
+        src: cisco_snmp_commnd_list.txt
+      register: vlan_file_content
+      #no_log: true # Used when don't want to display task in log
+
+    - name: Convert VLAN entries to a list
+      set_fact:
+        vlan_entries: "{{ vlan_file_content['content'] | b64decode | split('\n') | list }}"
+      #no_log: true
+
+    - name: Loop through VLAN entries and create VLANs
+      include_tasks: cisco_ios_snmp_config.yml
+      loop: "{{ vlan_entries }}"
+      loop_control:
+        loop_var: vlan_entry
+
+
+...
