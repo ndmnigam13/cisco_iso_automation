@@ -53,8 +53,8 @@
   gather_facts: no
   tasks:
     - name: Collecting all files from local backup folder
-      become: true
-      become_user: nigam
+      #become: true
+      #become_user: nigam
       ansible.builtin.file:
         path: /home/nigam/ansible_automation/cisco/ios/cisco_backup/tmp
         state: absent
