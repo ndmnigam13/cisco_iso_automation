@@ -22,7 +22,7 @@
         commands:
           - show running-config
       register: config_output
-      no_log: true
+      #no_log: true
 
     - name: Generate the backup file name
       set_fact:
