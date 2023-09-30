@@ -4,7 +4,10 @@
   tasks:
     - name: Creating local backup directory
       become: true
-      become_user: nigam
+      become_user: admin # Use Ansible Automation Platform user here
+      become_exe: admin # Use Ansible Automation Platform user here
+      #become_user: nigam - Use this when running on local ansible node
+      #become_exe: nigam - User this when running on local ansible node
       ansible.builtin.file:
         path: /home/nigam/ansible_automation/cisco/ios/cisco_backup/tmp
         state: directory
