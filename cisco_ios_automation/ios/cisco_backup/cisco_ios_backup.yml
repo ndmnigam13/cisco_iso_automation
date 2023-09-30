@@ -3,11 +3,8 @@
   gather_facts: no
   tasks:
     - name: Creating local backup directory
-      #become: true
-      #become_user: nigam # Use Ansible Automation Platform user here
-      #become_exe: nigam # Use Ansible Automation Platform user here
-      #become_user: nigam - Use this when running on local ansible node
-      #become_exe: nigam - User this when running on local ansible node
+      #become: true - Uncomment this when you are not using ansible automation Platform
+      #become_user: nigam - Uncomment this when you are not using ansible automation Platform
       ansible.builtin.file:
         path: /home/nigam/ansible_automation/cisco/ios/cisco_backup/tmp
         state: directory
@@ -22,7 +19,7 @@
         commands:
           - show running-config
       register: config_output
-      #no_log: true
+
 
     - name: Generate the backup file name
       set_fact:
@@ -53,8 +50,8 @@
   gather_facts: no
   tasks:
     - name: Collecting all files from local backup folder
-      #become: true
-      #become_user: nigam
+      #become: true - Uncomment this when you are not using ansible automation tower
+      #become_user: nigam - Uncomment this when you are not using ansible automation tower
       ansible.builtin.file:
         path: /home/nigam/ansible_automation/cisco/ios/cisco_backup/tmp
         state: absent
