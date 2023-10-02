@@ -20,6 +20,7 @@
       slurp:
         src: delete_L2_vlans_list.txt
       register: vlan_file
+      delegate_to: localhost
 
     - name: Parse VLAN information
       set_fact:
