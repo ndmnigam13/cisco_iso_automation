@@ -9,17 +9,16 @@
       slurp:
         src: create_vlan_list.txt
       register: vlan_file_content
-      no_log: true # Used when don't want to display task in log
-
+      
     - name: Convert VLAN entries to a list
       set_fact:
         vlan_entries: "{{ vlan_file_content.content | b64decode | split('\n') | list }}"
-      no_log: true
+      
 
     - name: Loop through VLAN entries and create VLANs
       include_tasks: create_L2_vlan.yml
       loop: "{{ vlan_entries }}"
       loop_control:
         loop_var: vlan_entry
-      no_log: true
+      
 ...
