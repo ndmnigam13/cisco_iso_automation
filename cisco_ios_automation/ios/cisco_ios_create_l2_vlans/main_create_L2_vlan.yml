@@ -9,6 +9,7 @@
       slurp:
         src: create_vlan_list.txt
       register: vlan_file_content
+      delegate_to: localhost
       
     - name: Convert VLAN entries to a list
       set_fact:
